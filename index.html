@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Breakpoints Demo</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      padding: 28px 16px;
+      font-family: Inter, Arial, sans-serif;
+      background: #fffcf9;
+      color: #1e293b;
+      text-align: center;
+    }
+    h1 { color: #4e89bd; margin: 0 0 6px; font-size: 1.8rem; }
+    .step { color: #64748b; margin: 0 0 18px; }
+
+    .stage { max-width: 1000px; margin: 0 auto; }
+    .width-label { font-weight: bold; color: #4e89bd; margin-bottom: 6px; font-size: 1.05rem; }
+    .frame-box { margin: 0 auto; transition: width 0.6s, height 0.6s; }
+    iframe {
+      border: 3px solid #1e293b;
+      border-radius: 10px;
+      background: #fff;
+      transform-origin: top left;
+      transition: width 0.6s;
+      display: block;
+    }
+
+    .caption {
+      max-width: 680px;
+      margin: 18px auto 12px;
+      font-size: 1.35rem;
+      line-height: 1.5;
+      min-height: 3em;
+    }
+    .codes { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; }
+    .code {
+      font-family: Consolas, monospace;
+      background: #fff;
+      border: 2px solid #4e89bd;
+      border-radius: 8px;
+      padding: 8px 16px;
+      text-align: left;
+      white-space: pre;
+      font-size: 1rem;
+    }
+    .code small { display: block; font-family: Inter, Arial, sans-serif; color: #64748b; font-size: 0.8rem; margin-bottom: 2px; }
+    .week2 { border-style: dashed; border-color: #94a3b8; }
+
+    .controls { margin-top: 20px; }
+    button {
+      font: inherit;
+      font-size: 1.1rem;
+      padding: 10px 24px;
+      margin: 0 6px;
+      border-radius: 8px;
+      border: 2px solid #4e89bd;
+      background: #4e89bd;
+      color: #fff;
+      cursor: pointer;
+    }
+    button:disabled { opacity: 0.4; cursor: default; }
+    #back { background: #fff; color: #4e89bd; }
+    .ruler { display: flex; justify-content: center; gap: 6px; margin-bottom: 8px; font-size: 0.9rem; }
+    .ruler span { padding: 2px 10px; border-radius: 999px; border: 1px solid #94a3b8; color: #94a3b8; }
+    .ruler span.on { background: #4e89bd; border-color: #4e89bd; color: #fff; }
+    .slider { margin-top: 16px; color: #64748b; font-size: 0.95rem; }
+    .slider input { width: 260px; vertical-align: middle; }
+  </style>
+</head>
+<body>
+  <h1>One site, every screen size</h1>
+  <p class="step" id="step">Screen 1</p>
+
+  <div class="stage" id="stage">
+    <div class="width-label" id="width-label">375px</div>
+    <div class="ruler" id="ruler"></div>
+    <div class="frame-box" id="frame-box"><iframe id="frame" title="Pretend screen"></iframe></div>
+  </div>
+
+  <p class="caption" id="caption"></p>
+  <div class="codes">
+    <div class="code" id="code"></div>
+    <div class="code week2" id="week2"></div>
+  </div>
+
+  <div class="controls">
+    <button id="back">← Back</button>
+    <button id="next">Next →</button>
+  </div>
+  <p class="slider">Drag the screen width: <input type="range" id="slider" min="320" max="1100" step="1"></p>
+
+  <script>
+    // Each screen: the pretend screen's width, the HTML (and any CSS) inside it, the words
+    // (= your SAY line), and the code to show. Jump to a screen with #5 in the address.
+    function site(options) {
+      const header = options.header || "bg-warning text-center py-4 py-md-5";
+      const h1 = options.h1 || "display-4 fw-bold";
+      const first = options.first || "col-12 col-md-6 col-lg-4";
+      const others = options.others || "col-12 col-md-6 col-lg-4";
+      const names = ["Taco · $4", "Burrito · $8", "Nachos · $6", "Quesadilla · $7"];
+      let cards = "";
+      names.forEach(function (name, i) {
+        cards += '<div class="' + (i === 0 ? first : others) + '"><div class="card p-3 h-100 fw-bold">' + name + "</div></div>";
+      });
+      return '<header class="' + header + '"><h1 class="' + h1 + ' mb-0">Taco Rocket</h1></header>' +
+        '<main class="container py-4"><div class="row g-3">' + cards + "</div></main>";
+    }
+
+    const heroCss = ".hero-title {\n  font-size: 2.5rem;\n}\n\n@media (min-width: 768px) {\n  .hero-title {\n    font-size: 4.5rem;\n  }\n}";
+
+    const screens = [
+      { width: 375, html: site({}),
+        caption: "A breakpoint is a screen width where your layout is allowed to change. The pills above show which of Bootstrap's breakpoints are on.",
+        code: "sm 576px · md 768px · lg 992px · xl 1200px" },
+      { width: 1100, html: site({}),
+        caption: "At 1100, sm, md and lg are all on. A breakpoint means: from this size UP. Tonight we mostly use md and lg.",
+        code: "sm 576px · md 768px · lg 992px · xl 1200px" },
+      { width: 375, html: site({}),
+        caption: "Mobile first: style the phone first. A class with no breakpoint, like py-4, works on every screen.",
+        code: '<header class="bg-warning text-center py-4 py-md-5">' },
+      { width: 1000, html: site({}),
+        caption: "py-md-5 turns on from 768 up. Watch the yellow header: more space above and below on the bigger screen.",
+        code: '<header class="bg-warning text-center py-4 py-md-5">' },
+      { width: 375, html: site({}),
+        caption: "The cards. col-12 means all 12 columns: full width. So on a phone, 1 card per row.",
+        code: 'class="col-12 col-md-6 col-lg-4"' },
+      { width: 800, html: site({}),
+        caption: "800 is past md. col-md-6 is 6 of 12 columns: half. 2 cards per row.",
+        code: 'class="col-12 col-md-6 col-lg-4"' },
+      { width: 1100, html: site({}),
+        caption: "1100 is past lg. col-lg-4 is 4 of 12: a third. 3 cards per row. 1, then 2, then 3.",
+        code: 'class="col-12 col-md-6 col-lg-4"' },
+      { width: 800, html: site({ others: "col-12 col-md-4" }),
+        caption: "Only the first card has the new classes. At 800: NO error. It just looks uneven. Uneven cards usually mean one card is missing its classes.",
+        code: 'card 1: col-12 col-md-6 col-lg-4\ncards 2–4: col-12 col-md-4   ← still the old classes' },
+      { width: 1100, html: site({ header: "bg-warning text-center py-4 py-md5" }),
+        caption: "Predict: py-md5, with a missing dash. NO red error, and the extra space is gone. Bootstrap has no class called py-md5, so the browser ignores it.",
+        code: '<header class="bg-warning text-center py-4 py-md5">   ← missing dash' },
+      { width: 1100, html: site({}),
+        caption: "Fixed: py, dash, md, dash, 5. The space is back. A class that does nothing usually means a typo.",
+        code: '<header class="bg-warning text-center py-4 py-md-5">' },
+      { width: 375, html: site({ h1: "hero-title fw-bold" }), css: heroCss,
+        caption: "Bootstrap doesn't have a heading size that jumps at md, so we write our own CSS. Phones get 2.5rem.",
+        code: '<h1 class="hero-title fw-bold">', own: heroCss },
+      { width: 1100, html: site({ h1: "hero-title fw-bold" }), css: heroCss,
+        caption: "From 768 up, the rule inside @media turns on: 4.5rem. That's how Bootstrap's md classes work on the inside.",
+        code: '<h1 class="hero-title fw-bold">', own: heroCss },
+      { width: 600, html: site({ h1: "hero-title fw-bold" }), css: heroCss,
+        caption: "Your turn to drive: drag the slider slowly from small to big. Watch the heading at 768, and the cards at 768 and 992.",
+        code: 'header: py-4 py-md-5 · cards: col-12 col-md-6 col-lg-4 · h1: hero-title' }
+    ];
+
+    const breakpoints = [["sm", 576], ["md", 768], ["lg", 992], ["xl", 1200]];
+    const frame = document.getElementById("frame");
+    const frameBox = document.getElementById("frame-box");
+    const stage = document.getElementById("stage");
+    const slider = document.getElementById("slider");
+    const FRAME_HEIGHT = 330;
+    let current = 0;
+    let shownDoc = null;
+    let width = 375;
+
+    function setWidth(newWidth) {
+      width = newWidth;
+      slider.value = width;
+      document.getElementById("width-label").textContent = width + "px";
+      const ruler = document.getElementById("ruler");
+      ruler.textContent = "";
+      breakpoints.forEach(function (bp) {
+        const pill = document.createElement("span");
+        pill.textContent = bp[0] + " " + bp[1];
+        if (width >= bp[1]) { pill.className = "on"; }
+        ruler.appendChild(pill);
+      });
+      const room = stage.clientWidth;
+      const scale = Math.min(1, room / (width + 6));
+      frame.style.width = (width + 6) + "px";
+      frame.style.height = FRAME_HEIGHT + "px";
+      frame.style.transform = "scale(" + scale + ")";
+      frameBox.style.width = Math.round((width + 6) * scale) + "px";
+      frameBox.style.height = Math.round(FRAME_HEIGHT * scale) + "px";
+    }
+
+    function show() {
+      const screen = screens[current];
+      document.getElementById("step").textContent = "Screen " + (current + 1) + " of " + screens.length;
+      document.getElementById("caption").textContent = screen.caption;
+      document.getElementById("code").innerHTML = "<small>The code</small>";
+      document.getElementById("code").append(screen.code);
+      const own = document.getElementById("week2");
+      own.style.display = screen.own ? "" : "none";
+      own.innerHTML = "<small>style.css</small>";
+      own.append(screen.own || "");
+      const doc = '<!DOCTYPE html><html><head><meta name="viewport" content="width=device-width, initial-scale=1">' +
+        '<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">' +
+        "<style>" + (screen.css || "") + "</style></head><body>" + screen.html + "</body></html>";
+      if (doc !== shownDoc) {
+        frame.srcdoc = doc;
+        shownDoc = doc;
+      }
+      setWidth(screen.width);
+      document.getElementById("back").disabled = current === 0;
+      document.getElementById("next").disabled = current === screens.length - 1;
+      history.replaceState(null, "", "#" + (current + 1));
+    }
+
+    document.getElementById("next").addEventListener("click", function () { current++; show(); });
+    document.getElementById("back").addEventListener("click", function () { current--; show(); });
+    slider.addEventListener("input", function () { setWidth(Number(slider.value)); });
+    window.addEventListener("resize", function () { setWidth(width); });
+    document.addEventListener("keydown", function (event) {
+      if (event.key === "ArrowRight" && current < screens.length - 1) { current++; show(); }
+      if (event.key === "ArrowLeft" && current > 0) { current--; show(); }
+    });
+
+    const start = parseInt(location.hash.slice(1), 10);
+    if (start >= 1 && start <= screens.length) { current = start - 1; }
+    show();
+</script>
+</body>
+</html>
